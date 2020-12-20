@@ -37,12 +37,18 @@ class PokemonDao(mongoClient: MongoClient) {
       .toFuture()
       .recoverWith { case e: Throwable => { println(e); Future.failed(e) } }
       .map(_ => {})
-    // val query = Future { collection.insertMany(data) }
-    // // Await.result(query.toFuture(), Duration(10, SECONDS))
-    // query.onComplete {
-    //   case Success(value)     => println("Upload Complete!")
-    //   case Failure(exception) => println(exception)
-    // }
   }
+
+  def getAllPokemonFromCollection(nameOfCollection: String) {
+    val collection: MongoCollection[Pokemon] =
+      db.getCollection(nameOfCollection)
+    collection.find()
+  }
+
+  // def postResult(criteria: String) {
+  //   val collection: MongoCollection[Pokemon] =
+  //     db.getCollection(nameOfCollection)
+  //   collection.find(filter)
+  // }
 
 }

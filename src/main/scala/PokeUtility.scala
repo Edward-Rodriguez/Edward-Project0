@@ -2,7 +2,6 @@ package scala
 
 import play.api.libs.json._
 import scala.io.Source
-import play.api.libs.functional.syntax._
 object PokeUtility {
 
   private val baseURL = "https://pokeapi.co/api/v2/pokemon/"
@@ -50,6 +49,7 @@ object PokeUtility {
       data: List[JsValue]
   ): Pokemon = {
     Pokemon(
+      data(0).as[Int], //sets _id = pokedex #
       data(0).as[Int], // pokedexNumber
       data(1).as[String], // name
       data(4).as[Int], // hp
@@ -62,16 +62,6 @@ object PokeUtility {
       data(3).as[String] // optional type 2
     )
   }
-
-  // def getPokemonCollection(numOfPokemon: String): Set[Pokemon] = {
-  //   val pokemonList = List[Pokemon]()
-  //   for (pokedexNumber <- 1 to numOfPokemon) {
-  //     pokemonList.addOne(
-  //       convertDataToPokemon(getPokemonStats(pokedexNumber.toString()))
-  //     )
-  //   }
-  //   pokemonList.toSet
-  // }
 
   def getPokemon(pokedexNumber: Int): Pokemon = {
     convertDataToPokemon(getPokemonStats(pokedexNumber))
