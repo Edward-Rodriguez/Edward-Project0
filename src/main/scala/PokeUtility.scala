@@ -3,8 +3,6 @@ package scala
 import play.api.libs.json._
 import scala.io.Source
 import play.api.libs.functional.syntax._
-import scala.collection.mutable.ListBuffer
-
 object PokeUtility {
 
   private val baseURL = "https://pokeapi.co/api/v2/pokemon/"
@@ -18,12 +16,12 @@ object PokeUtility {
   private val POKEMON_SEARCH_RESULTS = "results"
   private val NO_SECOND_TYPE = "none"
 
-  private def parseJSON(pokemonIDOrName: String): JsValue = {
+  private def parseJSON(pokemonIDOrName: Int): JsValue = {
     val src = Source.fromURL(s"$baseURL$pokemonIDOrName").mkString
     Json.parse(src)
   }
 
-  def getPokemonStats(pokemonIdOrName: String): ListBuffer[JsValue] = {
+  def getPokemonStats(pokemonIdOrName: Int): List[JsValue] = {
     val json = parseJSON(pokemonIdOrName)
     val pokemon_name = (json \ STAT_NAME).get
     val pokemon_ID = (json \ POKEMON_ID).get
@@ -31,13 +29,14 @@ object PokeUtility {
     val type1 = getPokemonType(typesCategory, 1)
     val type2 = getPokemonType(typesCategory, 2)
     val statsCategory = (json \ STATS_CATEGORY).get
-    val statsList = ListBuffer(pokemon_ID, pokemon_name, type1, type2);
-    for (statCol <- 0 to 5)
-      statsList.addOne((statsCategory \ statCol \ BASE_STAT).get)
-    statsList
+    val statsList = List(pokemon_ID, pokemon_name, type1, type2);
+    val tempStatList = for (statCol <- 0 to 5) yield {
+      (statsCategory \ statCol \ BASE_STAT).get
+    }
+    statsList ++ tempStatList
   }
 
-  def getPokemonType(json: JsValue, typeNumber: Int): JsValue =
+  private def getPokemonType(json: JsValue, typeNumber: Int): JsValue =
     typeNumber match {
       case 1 => (json \ 0 \ POKEMON_TYPE \ STAT_NAME).get
       case 2 =>
@@ -48,7 +47,7 @@ object PokeUtility {
     }
 
   def convertDataToPokemon(
-      data: ListBuffer[JsValue]
+      data: List[JsValue]
   ): Pokemon = {
     Pokemon(
       data(0).as[Int], // pokedexNumber
@@ -64,14 +63,18 @@ object PokeUtility {
     )
   }
 
-  def getPokemonCollection(numOfPokemon: Int): Set[Pokemon] = {
-    val pokemonList = ListBuffer[Pokemon]()
-    for (pokedexNumber <- 1 to numOfPokemon) {
-      pokemonList.addOne(
-        convertDataToPokemon(getPokemonStats(pokedexNumber.toString()))
-      )
-    }
-    pokemonList.toSet
+  // def getPokemonCollection(numOfPokemon: String): Set[Pokemon] = {
+  //   val pokemonList = List[Pokemon]()
+  //   for (pokedexNumber <- 1 to numOfPokemon) {
+  //     pokemonList.addOne(
+  //       convertDataToPokemon(getPokemonStats(pokedexNumber.toString()))
+  //     )
+  //   }
+  //   pokemonList.toSet
+  // }
+
+  def getPokemon(pokedexNumber: Int): Pokemon = {
+    convertDataToPokemon(getPokemonStats(pokedexNumber))
   }
 
 }

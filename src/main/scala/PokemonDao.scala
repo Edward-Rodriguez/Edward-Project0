@@ -13,6 +13,8 @@ import scala.concurrent.Future
 import org.mongodb.scala.Observable
 import scala.concurrent.Await
 import scala.concurrent.duration.{Duration, SECONDS}
+import scala.util.Success
+import scala.util.Failure
 
 class PokemonDao(mongoClient: MongoClient) {
   val DATABASE_NAME = "pokemon"
@@ -30,8 +32,17 @@ class PokemonDao(mongoClient: MongoClient) {
   ) {
     val collection: MongoCollection[Pokemon] =
       db.getCollection(nameOfCollection)
-    val query = collection.insertMany(data)
-    Await.result(query.toFuture(), Duration(10, SECONDS))
+    collection
+      .insertMany(data)
+      .toFuture()
+      .recoverWith { case e: Throwable => { println(e); Future.failed(e) } }
+      .map(_ => {})
+    // val query = Future { collection.insertMany(data) }
+    // // Await.result(query.toFuture(), Duration(10, SECONDS))
+    // query.onComplete {
+    //   case Success(value)     => println("Upload Complete!")
+    //   case Failure(exception) => println(exception)
+    // }
   }
 
 }
