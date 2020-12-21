@@ -1,16 +1,9 @@
 package scala
 
-import java.util.HashSet
 import org.mongodb.scala._
-import scala.concurrent.duration.Duration
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import Pokemon._
-import PokeUtility._
-import scala.io.StdIn.readInt
-import scala.util.Success
-import scala.util.Failure
-
+import scala.util.{Success, Failure}
 object Project0 extends App {
   val t1 = System.nanoTime
 
@@ -47,7 +40,7 @@ object Project0 extends App {
     }
   }
 
-  getTopAttackers(10)
+  getTopAttackers(20)
 
   val duration = (System.nanoTime - t1) / 1e9d
   println(s"Time it took to run: $duration secs")

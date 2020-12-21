@@ -1,21 +1,17 @@
 package scala
 
-import org.mongodb.scala.MongoClient
+import org.mongodb.scala.{MongoClient, MongoCollection}
 import org.mongodb.scala.bson.codecs.Macros._
 import org.mongodb.scala.MongoClient.DEFAULT_CODEC_REGISTRY
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import org.mongodb.scala.Observable
+import scala.concurrent.duration.{Duration, SECONDS}
+import scala.util.{Success, Failure}
 import org.bson.codecs.configuration.CodecRegistries.{
   fromProviders,
   fromRegistries
 }
-import org.mongodb.scala.MongoCollection
-import scala.concurrent.Future
-import org.mongodb.scala.Observable
-import scala.concurrent.Await
-import scala.concurrent.duration.{Duration, SECONDS}
-import scala.util.Success
-import scala.util.Failure
-
 class PokemonDao(mongoClient: MongoClient) {
   val DATABASE_NAME = "pokemon"
   val pokemonCodecRegistry =
